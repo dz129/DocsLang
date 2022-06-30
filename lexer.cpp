@@ -34,7 +34,8 @@ class lexer{
     Token getToken(){
         //initializes a token every time that the function is run
         Token token;
-        std::cout<<tokenizer.input[1];
+        std::cout<<tokenizer.input[tokenizer.count];
+        std::cout << "goin through";
         char currentChar = tokenizer.input[tokenizer.count];
         IgnoreCandW();
         switch(currentChar){
@@ -141,7 +142,7 @@ class lexer{
         }
     }
 
-    std::vector<Token> lexInput(char *input){
+    std::vector<Token> lexInput(std::string input){
         std::cout << input;
         std::vector<Token> lexvec;
         Tokenizer tokenizer;
@@ -151,11 +152,12 @@ class lexer{
         bool islexing = true;
         while (islexing){
             std::cout << tokenizer.count;
-            if (tokenizer.count >= sizeof(input)) islexing = false;
+            if (tokenizer.count >= input.size()) islexing = false;
             else if (tokenizer.errorStatus) islexing = false;
             else{
                 lexvec.push_back(getToken());
             }
+            tokenizer.count += 1;
         }
         return lexvec;
     }
@@ -205,9 +207,8 @@ class lexer{
 
 int main(){
     lexer Lexer;
-    std::string input;
-    char* inputc = const_cast<char*>(input.c_str());
+    std::string input;;
         std::cout << "user>";
         getline(std::cin, input);
-        Lexer.lexInput(inputc);
+        Lexer.lexInput(input);
 }
