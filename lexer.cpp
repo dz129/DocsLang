@@ -3,10 +3,14 @@
 #include <vector>
 #include <string>
 
-class lexer{
+class Tokenizer{
     private:
-    Tokenizer tokenizer;
+    bool errorStatus = false;
+    int tokenStart;
+    int tokenEnd;
+    int count;
     public:
+    std::string input;
     bool isWhite(char c){
         return (c == ' ') || (c == '\t') || (c == '\f') || (c == '\v');
     }
@@ -26,70 +30,76 @@ class lexer{
     void IgnoreCandW(){
         //if there is a whitespace or comment, we will just move the tokenizer's index forward to keep scanning
         //this needs to eb changed so that comments do nothing
-        if (isCom(tokenizer.input[tokenizer.count]) || isWhite(tokenizer.input[tokenizer.count])){
-            tokenizer.count += 1;
+        
+        if (isCom(input[count]) || isWhite(input[count])){
+            std::cout << "ignored whitespace" <<"\n";
+            count += 1;
         }
     }
 
     Token getToken(){
         //initializes a token every time that the function is run
         Token token;
-        std::cout<<tokenizer.input[tokenizer.count];
-        std::cout << "goin through";
-        char currentChar = tokenizer.input[tokenizer.count];
+        std::cout<< input[count];
+        std::cout << "goin through" <<"\n";
+        char currentChar = input[count];
         IgnoreCandW();
         switch(currentChar){
 
-            case '\0': tokenizer.count += 1; token.type = END; break;
+            case '\0': count += 1; token.type = END; break;
 
-            case '(': tokenizer.count += 1; token.type = LPAR; break;
-            case ')': tokenizer.count += 1; token.type = RPAR; break;
-            case '[': tokenizer.count += 1; token.type = LBRACK; break;
-            case ']': tokenizer.count += 1; token.type = RBRACK; break;
-            case '{': tokenizer.count += 1; token.type = LBRACE; break;
-            case '}': tokenizer.count += 1; token.type = RBRACE; break;
+            case '(': count += 1; token.type = LPAR; break;
+            case ')': count += 1; token.type = RPAR; break;
+            case '[': count += 1; token.type = LBRACK; break;
+            case ']': count += 1; token.type = RBRACK; break;
+            case '{': count += 1; token.type = LBRACE; break;
+            case '}': count += 1; token.type = RBRACE; break;
 
-            case '+': tokenizer.count += 1; token.type = PLUS; break;
-            case '-': tokenizer.count += 1; token.type = MINUS; break;
-            case '*': tokenizer.count += 1; token.type = TIMES; break;
-            case '/': tokenizer.count += 1; token.type = SLASH; break;
-            case '.': tokenizer.count += 1; token.type = PERIOD; break;
+            case '+': count += 1; token.type = PLUS; break;
+            case '-': count += 1; token.type = MINUS; break;
+            case '*': count += 1; token.type = TIMES; break;
+            case '/': count += 1; token.type = SLASH; break;
+            case '.': count += 1; token.type = PERIOD; break;
 
-            case '=': tokenizer.count += 1; token.type = EQL; break;
-            case '>': tokenizer.count += 1; token.type = GTT; break;
-            case '<': tokenizer.count += 1; token.type = LST; break;
-            case '!': tokenizer.count += 1; token.type = NOT; break;
+            case '=': count += 1; token.type = EQL; break;
+            case '>': count += 1; token.type = GTT; break;
+            case '<': count += 1; token.type = LST; break;
+            case '!': count += 1; token.type = NOT; break;
 
             case '"':
             {
                 //increases the count by one so that it ignores the quote
-                std::cout << "string";
-                tokenizer.count += 1;
+                std::cout << "string"<<"\n";
+                count += 1;
                 token.type = STRING;
-                tokenizer.tokenstart = tokenizer.count;
-                while (currentChar != '"'){
-                    tokenizer.count += 1;
+                tokenStart = count;
+                while (input[count] != '"' && count < input.size()){
+                    std::cout << input[count] << "\n";
+                    count += 1;
                     if (currentChar == '\0') {
                         std::cout << "ERROR, MISSING QUOTE";
-                        tokenizer.errorStatus = true;
+                        errorStatus = true;
                         break;}
                 }
                 //decreases the count by one to not include the quote
-                tokenizer.tokenend = tokenizer.count - 1;
-                token.contents = tokenizer.input[tokenizer.tokenstart,tokenizer.tokenend];
+                
+                tokenEnd = count - 1;
+                count += 1;
+                token.contents = input.substr(tokenStart, tokenEnd);
+                std::cout << token.contents << "\n";
                 //increases the count by 2 to skip over
-                tokenizer.count += 2;
                 break;
             }
             default:
-                if (isLetter(tokenizer.input[tokenizer.count])){
-                    tokenizer.tokenstart = tokenizer.count;
+                if (isLetter(input[count])){
+                    std::cout << "identifyer"<<"\n";
+                    tokenStart = count;
                     token.type = IDENTIFIER;
-                    while (isLetter(tokenizer.input[tokenizer.count]) || isNum(tokenizer.input[tokenizer.count]) || tokenizer.input[tokenizer.count] == ':'){
-                        tokenizer.count += 1;
+                    while (isLetter(input[count]) || isNum(input[count]) || input[count] == ':'){
+                        count += 1;
                     }
-                    tokenizer.tokenend = tokenizer.count - 1;
-                    token.contents = tokenizer.input[tokenizer.tokenstart,tokenizer.tokenend];
+                    tokenEnd = count - 1;
+                    token.contents = input[tokenStart,tokenEnd];
                     if (token.contents == "eval::"){
                         token.type = EVAL;
                         break;
@@ -112,52 +122,53 @@ class lexer{
                     }
                     else{
                         std::cout << "Syntax Error";
-                        tokenizer.errorStatus = true;
+                        errorStatus = true;
                         break;
                     }
 
                 }
-                else if (isNum(tokenizer.input[tokenizer.count])){
+                else if (isNum(input[count])){
+                    std::cout<< "number";
                     bool floatstatus = false;
-                    tokenizer.tokenstart = tokenizer.count;
+                    tokenStart = count;
                     token.type = INT;
-                    while (isNum(tokenizer.input[tokenizer.count])){
-                        tokenizer.count += 1;
-                        if (tokenizer.input[tokenizer.count] == '.'){
+                    while (isNum(input[count] && count < input.size())){
+                        count += 1;
+                        std::cout << input[count] <<"\n";
+                        if (input[count] == '.'){
                             if (floatstatus) {
                                 token.type = FLOAT;
-                            tokenizer.count += 1;
+                            count += 1;
                             }
                             else{
                                 std::cout << "Error, more than two decimals";
-                                tokenizer.errorStatus = true;
+                                errorStatus = true;
                                 break;
                             }
                         }
                     }
-                    tokenizer.tokenend = tokenizer.count;
-                    token.contents = tokenizer.input[tokenizer.tokenstart,tokenizer.tokenend];
+                    tokenEnd = count;
+                    token.contents = input.substr(tokenStart, tokenEnd);;
+                    std::cout << token.contents << "\n";
                 }
 
         }
     }
 
-    std::vector<Token> lexInput(std::string input){
-        std::cout << input;
+    std::vector<Token> lexInput(){
+        std::cout << input<<"\n";
         std::vector<Token> lexvec;
-        Tokenizer tokenizer;
-        tokenizer.input = input;
-        tokenizer.count = 0;
-        tokenizer.tokenstart = 0;
+        count = 0;
+        tokenStart = 0;
         bool islexing = true;
         while (islexing){
-            std::cout << tokenizer.count;
-            if (tokenizer.count >= input.size()) islexing = false;
-            else if (tokenizer.errorStatus) islexing = false;
+            std::cout << count<<"\n";
+            if (count >= input.size()) islexing = false;
+            else if (errorStatus) islexing = false;
             else{
                 lexvec.push_back(getToken());
+                if (count >= input.size()) islexing = false;
             }
-            tokenizer.count += 1;
         }
         return lexvec;
     }
@@ -206,9 +217,10 @@ class lexer{
 };
 
 int main(){
-    lexer Lexer;
-    std::string input;;
-        std::cout << "user>";
-        getline(std::cin, input);
-        Lexer.lexInput(input);
+    Tokenizer tokenizer;
+    std::string userinput;
+    std::cout << "user>";
+    getline(std::cin, userinput);
+    tokenizer.input = userinput;
+    tokenizer.lexInput();
 }
