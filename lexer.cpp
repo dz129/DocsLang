@@ -40,31 +40,30 @@ class Tokenizer{
     Token getToken(){
         //initializes a token every time that the function is run
         Token token;
-        std::cout<< input[count];
+        std::cout<< input[count] << "\n";
         std::cout << "goin through" <<"\n";
-        char currentChar = input[count];
         IgnoreCandW();
-        switch(currentChar){
+        switch(input[count]){
 
-            case '\0': count += 1; token.type = END; break;
+            case '\0': count += 1; token.type = END; return token;
 
-            case '(': count += 1; token.type = LPAR; break;
-            case ')': count += 1; token.type = RPAR; break;
-            case '[': count += 1; token.type = LBRACK; break;
-            case ']': count += 1; token.type = RBRACK; break;
-            case '{': count += 1; token.type = LBRACE; break;
-            case '}': count += 1; token.type = RBRACE; break;
+            case '(': count += 1; token.type = LPAR; return token;
+            case ')': count += 1; token.type = RPAR; return token;
+            case '[': count += 1; token.type = LBRACK; return token;
+            case ']': count += 1; token.type = RBRACK; return token;
+            case '{': count += 1; token.type = LBRACE; return token;
+            case '}': count += 1; token.type = RBRACE; return token;
 
-            case '+': count += 1; token.type = PLUS; break;
-            case '-': count += 1; token.type = MINUS; break;
-            case '*': count += 1; token.type = TIMES; break;
-            case '/': count += 1; token.type = SLASH; break;
-            case '.': count += 1; token.type = PERIOD; break;
+            case '+': count += 1; token.type = PLUS; return token;
+            case '-': count += 1; token.type = MINUS; return token;
+            case '*': count += 1; token.type = TIMES; return token;
+            case '/': count += 1; token.type = SLASH; return token;
+            case '.': count += 1; token.type = PERIOD; return token;
 
-            case '=': count += 1; token.type = EQL; break;
-            case '>': count += 1; token.type = GTT; break;
-            case '<': count += 1; token.type = LST; break;
-            case '!': count += 1; token.type = NOT; break;
+            case '=': count += 1; token.type = EQL; return token;
+            case '>': count += 1; token.type = GTT; return token;
+            case '<': count += 1; token.type = LST; return token;
+            case '!': count += 1; token.type = NOT; return token;
 
             case '"':
             {
@@ -76,10 +75,11 @@ class Tokenizer{
                 while (input[count] != '"' && count < input.size()){
                     std::cout << input[count] << "\n";
                     count += 1;
-                    if (currentChar == '\0') {
-                        std::cout << "ERROR, MISSING QUOTE";
+                    if (input[count] == '\0') {
+                        std::cout << "ERROR, MISSING QUOTE" << "\n";
                         errorStatus = true;
-                        break;}
+                        break;
+                        }
                 }
                 //decreases the count by one to not include the quote
                 
@@ -88,7 +88,7 @@ class Tokenizer{
                 token.contents = input.substr(tokenStart, tokenEnd);
                 std::cout << token.contents << "\n";
                 //increases the count by 2 to skip over
-                break;
+                return token;
             }
             default:
                 if (isLetter(input[count])){
@@ -102,37 +102,37 @@ class Tokenizer{
                     token.contents = input[tokenStart,tokenEnd];
                     if (token.contents == "eval::"){
                         token.type = EVAL;
-                        break;
+                        return token;
                     }
                     else if (token.contents == "print::"){
                         token.type = PRINT;
-                        break;
+                        return token;
                     }
                     else if (token.contents == "if"){
                         token.type = IF;
-                        break;
+                        return token;
                     }
                     else if (token.contents == "while"){
                         token.type = WHILE;
-                        break;
+                        return token;
                     }
                     else if (token.contents == "return"){
                         token.type = RETURN;
-                        break;
+                        return token;
                     }
                     else{
-                        std::cout << "Syntax Error";
+                        std::cout << "Syntax Error"<< "\n";
                         errorStatus = true;
-                        break;
+                        return token;
                     }
 
                 }
                 else if (isNum(input[count])){
-                    std::cout<< "number";
+                    std::cout<< "number" << "\n";
                     bool floatstatus = false;
                     tokenStart = count;
                     token.type = INT;
-                    while (isNum(input[count] && count < input.size())){
+                    while (isNum(input[count]) && count < input.size()){
                         count += 1;
                         std::cout << input[count] <<"\n";
                         if (input[count] == '.'){
@@ -141,7 +141,7 @@ class Tokenizer{
                             count += 1;
                             }
                             else{
-                                std::cout << "Error, more than two decimals";
+                                std::cout << "Error, more than two decimals"<< "\n";
                                 errorStatus = true;
                                 break;
                             }
@@ -150,6 +150,7 @@ class Tokenizer{
                     tokenEnd = count;
                     token.contents = input.substr(tokenStart, tokenEnd);;
                     std::cout << token.contents << "\n";
+                    return token;
                 }
 
         }
@@ -224,3 +225,4 @@ int main(){
     tokenizer.input = userinput;
     tokenizer.lexInput();
 }
+
