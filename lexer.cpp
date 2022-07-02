@@ -40,8 +40,6 @@ class Tokenizer{
     Token getToken(){
         //initializes a token every time that the function is run
         Token token;
-        std::cout<< input[count] << "\n";
-        std::cout << "goin through" <<"\n";
         IgnoreCandW();
         switch(input[count]){
 
@@ -68,12 +66,10 @@ class Tokenizer{
             case '"':
             {
                 //increases the count by one so that it ignores the quote
-                std::cout << "string"<<"\n";
                 count += 1;
                 token.type = STRING;
                 tokenStart = count;
                 while (input[count] != '"' && count < input.size()){
-                    std::cout << input[count] << "\n";
                     count += 1;
                     if (input[count] == '\0') {
                         std::cout << "ERROR, MISSING QUOTE" << "\n";
@@ -86,20 +82,18 @@ class Tokenizer{
                 tokenEnd = count - 1;
                 count += 1;
                 token.contents = input.substr(tokenStart, tokenEnd);
-                std::cout << token.contents << "\n";
                 //increases the count by 2 to skip over
                 return token;
             }
             default:
                 if (isLetter(input[count])){
-                    std::cout << "identifyer"<<"\n";
                     tokenStart = count;
                     token.type = IDENTIFIER;
                     while (isLetter(input[count]) || isNum(input[count]) || input[count] == ':'){
                         count += 1;
                     }
-                    tokenEnd = count - 1;
-                    token.contents = input[tokenStart,tokenEnd];
+                    tokenEnd = count;
+                    token.contents = input.substr(tokenStart, tokenEnd);
                     if (token.contents == "eval::"){
                         token.type = EVAL;
                         return token;
@@ -121,7 +115,7 @@ class Tokenizer{
                         return token;
                     }
                     else{
-                        std::cout << "Syntax Error"<< "\n";
+                        std::cout << "SYNTAX ERROR"<< "\n";
                         errorStatus = true;
                         return token;
                     }
@@ -136,20 +130,21 @@ class Tokenizer{
                         count += 1;
                         std::cout << input[count] <<"\n";
                         if (input[count] == '.'){
-                            if (floatstatus) {
+                            if (!floatstatus) {
+                                floatstatus = true;
                                 token.type = FLOAT;
-                            count += 1;
+                                std::cout << "float";
+                                count += 1;
                             }
                             else{
-                                std::cout << "Error, more than two decimals"<< "\n";
+                                std::cout << "ERROR: MORE THAN TWO DECIMALS"<< "\n";
                                 errorStatus = true;
                                 break;
                             }
                         }
                     }
                     tokenEnd = count;
-                    token.contents = input.substr(tokenStart, tokenEnd);;
-                    std::cout << token.contents << "\n";
+                    token.contents = input.substr(tokenStart, tokenEnd);
                     return token;
                 }
 
@@ -218,11 +213,12 @@ class Tokenizer{
 };
 
 int main(){
+    for (;;){
     Tokenizer tokenizer;
     std::string userinput;
     std::cout << "user>";
     getline(std::cin, userinput);
     tokenizer.input = userinput;
     tokenizer.lexInput();
+    }
 }
-
