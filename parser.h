@@ -14,19 +14,18 @@
 
 //if identifier is eval::, do this
 struct evalTree{
-    int firstnum;
-    Token operation;
+    int num;
+    TokenType operation;
     //as recursion finishes, second num will get filled out, and the operation will happen
-    int secondnum;
     evalTree* next;
 };
 
 //if identifier is print::, do this
 struct printTree{
-    std::string firstPrint;
-    Token operation;
-    std::string secondPrint;
+    std::string print;
+    TokenType operation;
     printTree* next;
+    bool syntaxError = false;
 };
 
 //the scanIdentifier function initializes this root
