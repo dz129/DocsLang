@@ -9,6 +9,8 @@ class parser{
     //first lets build the eval root
     //next we will add if statents
     private:
+    std::stack<Token> infixOperation;
+    std::stack<Token> finalpostfix;
     public:
     std::vector<Token> tokenvec; // this will be from the tokenizer
     int vecIndex = 1;
@@ -35,9 +37,24 @@ class parser{
             }
         }
     }
-
+    void inToPre(){
+        //infix to prefix conversion into two separate stacks
+        for (int i = 1; i < tokenvec.size(); i++){
+            if (tokenvec[i].type == INT) finalpostfix.push(tokenvec[i]);
+            else{
+                if (infixOperation.empty()) infixOperation.push(tokenvec[i]);
+                else{
+                    if (infixOperation.top().type >= tokenvec[i].type) {
+                        finalpostfix.push(infixOperation.top());
+                        infixOperation.pop();
+                        infixOperation.push(tokenvec[i]);
+                        }
+                }
+            }
+        }
+    }
     void fillEval(){
-
+        
     }
 
     void fillPrint(int vecIndex, std::vector<Token> tokenvec, printTree* root){
